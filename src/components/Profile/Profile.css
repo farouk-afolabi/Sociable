@@ -1,0 +1,192 @@
+@import url("https://fonts.googleapis.com/css2?family=Inconsolata:wght@200..900&display=swap");
+
+/* Base container styles */
+/*Hex	RGB
+Milky dark blue #7289da	(114,137,218)
+Lightest Dark - #424549	(66,69,73)
+Light Dark   -  #36393e	(54,57,62)
+Dark black   -  #282b30	(40,43,48)
+Darkest black - #1e2124	(30,33,36)*/
+
+.profile-container {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  padding: 20px;
+  font-family: "Inconsolata", monospace;
+  font-weight: bold;
+  font-size: 16px;
+  text-align: left;
+}
+
+.profile-content {
+  margin-left: 250px;
+  flex-grow: 1;
+  padding: 20px;
+  text-align: left;
+  font-family: "Inconsolata", monospace;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.myProfile {
+  font-size: 24px; 
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 20px;
+  font-family: "Inconsolata", monospace;
+  padding-bottom: 20px;
+  padding-top: 20px;
+  width: 100%;
+  color: white;
+  border-bottom: 1px solid #ccc;
+  justify-content: center;
+  box-shadow: 0px 10px 20px -10px #7289da;
+}
+
+.profile-picture {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+  
+}
+
+.profile-picture img {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ccc;
+  background-color: #1e2124;
+}
+
+.editProfileDetails {
+  display: block;
+  margin: 10px 0;
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  font-family: "Inconsolata", monospace;
+  background-color: #7289da;
+  color: white;
+  border: 2px solid #ccc;
+  border-radius: 0px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  text-align: center;
+  width: 50%;
+  margin-left: 25%;
+}
+
+.editProfileDetails:hover {
+  background-color: #282b30;
+  color: #7289da;
+}
+
+.freelancer-profile
+ {
+  background-color: #282b30;
+  padding: 20px;
+  margin: 20px 0;
+  border-radius: 8px;
+  border: 2px solid #333;
+  text-align: left;
+  font-family: "Inconsolata", monospace;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.freelancer-profile h3 {
+  font-size: 20px; 
+  font-weight: bold;
+  color: white;
+  border-bottom: 2px solid #7289da;
+  padding-bottom: 5px;
+  margin-bottom: 10px;
+  text-align: left;
+  font-family: "Inconsolata", monospace;
+}
+
+.freelancer-profile-details p{
+  font-size: 16px;
+  font-weight: bold;
+  margin: 10px 0;
+  color: white;
+  text-align: left;
+  font-family: "Inconsolata", monospace;
+}
+
+.freelancer-profile label {
+  display: block;
+  text-align: left;
+  margin-top: 10px;
+  font-weight: bold;
+  font-family: "Inconsolata", monospace;
+  font-size: 16px;
+  color: white;
+}
+
+.freelancer-profile input,
+.freelancer-profile textarea {
+  all: unset;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  border-radius: none;
+  width: 98%;
+  padding: 8px;
+  background-color: #424549;
+  margin-right: -10px;
+  justify-self: left;
+  border-bottom: 2px solid #ccc;
+  color: white;
+  font-size: 16px;
+  font-family: "Inconsolata", monospace;
+  font-weight: bold;
+}
+
+.freelancer-profile input:focus,
+.freelancer-profile textarea:focus {
+  transition: all 0.3s ease;
+  background-color: #7289da;
+  border-bottom: 2px solid white;
+}
+
+.freelancer-profile input:hover,
+.freelancer-profile textarea:hover {
+  background-color: #55585b;
+}
+.freelancer-profile textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.freelancer-profile button {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  font-family: "Inconsolata", monospace;
+  background-color: #282b30;
+  color: white;
+  border: 2px solid #7289da;
+  border-radius: 0px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  width: 50%;
+  justify-self: center;
+  margin-left: 25%;
+}
+
+.freelancer-profile button:hover {
+  background-color: #7289da;
+  color: white;
+  border: 2px solid #ccc;
+}
+
+@media (max-width: 1000px) {
+  .profile-container {
+    margin-left: -180px;
+  }
+}

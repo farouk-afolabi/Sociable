@@ -1,0 +1,64 @@
+@import url("https://fonts.googleapis.com/css2?family=Inconsolata:wght@200..900&display=swap");
+
+.followers-list {
+  display: flex;
+  flex-direction: column;
+  border: 2px solid #7289da;
+  max-height: 200px;
+  overflow-y: auto; 
+}
+
+.follower-item {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  transition: background-color 0.3s ease;
+  cursor: pointer;
+  background-color: #424549;
+  border-bottom: 1px solid #7289da; 
+}
+
+.follower-item:hover {
+  background-color: #7289da;
+}
+
+.follower-info {
+  display: flex;
+  align-items: center;
+  gap: 5px; 
+}
+
+.icon-text {
+  margin-left: auto;
+}
+
+.profile-img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+
+.name-text {
+  font-size: 16px;
+  font-weight: bold;
+  font-family: "Inconsolata", monospace;
+  color: white;
+}
+
+.follower-info svg {
+  color: white;
+}
+
+.follower-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.noFollowers {
+  color: #7289da;
+  font-weight: bold;
+  font-size: 14px;
+  text-align: center;
+}

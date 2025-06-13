@@ -1,0 +1,145 @@
+
+@import url("https://fonts.googleapis.com/css2?family=Inconsolata:wght@200..900&display=swap");
+
+.sidebarfeeds {
+  width: 350px;
+  width: 100%; 
+  background-color: #1e2124; 
+  color: white;
+  padding: 20px;
+  transition: max-width 0.3s ease;
+  position: fixed; 
+  top: 0; 
+  right: 0; 
+  border-left: 2px solid #ccc;
+  height: 100vh; 
+  font-family: "Inconsolata", monospace;
+  font-size: 14px; 
+  overflow-y: auto; 
+  
+  .my-app-updates {
+    text-align: center;
+    padding: 5px;
+    background-color: #424549;
+    color: 	white;
+    border-radius: 5px;
+    font-weight: 600;
+    font-style: italic;
+    font-size: 30px;
+    border: 	#7289da 2px solid;
+  }
+
+  .title-navigation {
+    display: flex;
+    flex-direction: column;
+
+    a {
+      border-bottom: 2px solid transparent;
+      margin-bottom: 5px;
+      padding-bottom: 2.5px;
+      width: 100%;
+
+      .textRender {
+        text-decoration: none;
+        color: white;
+        margin-left: 5px;
+        font-size: 16px;
+        font-weight: bold;
+        padding: 10px;
+      }
+      .iconRender {
+        color: #7289da;
+        font-size: 20px;
+      }
+      .textRender:hover + .iconRender {
+        color: #ccc;
+      }
+    }
+
+    a:hover {
+      transition: border-bottom 0.6s ease-in-out;
+      border-bottom: 2px solid #7289da;
+      .textRender {
+        color: #7289da;
+      }
+    }
+  }
+
+  .friends {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+
+    button {
+      border: none;
+      background-color: #282b30;
+      border-radius: 0;
+      color: white;
+      border: 1px solid #7289da;
+      font-weight: bold;
+      width: 100%;
+
+      .handShake{
+        padding-right:5px;
+        font-size: 16px;
+        color: #7289da;
+      }
+
+      .userCheck {
+        padding-right: 5px;
+        font-size:16px;
+        color: #7289da;
+      }
+      .userCheckText{
+        color: white;
+      }
+    }
+
+    .active-btn {
+      background-color: #7289da;
+      color: #1e2124;
+      .handShake{
+        color: #1e2124;
+      }
+
+      .userCheck {
+        color: #1e2124;
+      }
+    }
+  }
+}
+.arrow-icon  {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: transparent;
+  justify-self: center;
+  border: none;
+  color: white;
+  font-size: 20px;
+}
+
+.arrow-icon:hover {
+  background-color: transparent;
+  border-radius: 0%;
+  color: #7289da;
+  
+}
+.sidebarfeeds {
+  transition: width 0.3s ease;
+  overflow: hidden;
+}
+
+.sidebarfeeds.collapsed {
+  width: 30px;
+}
+
+.sidebarfeeds.collapsed .sidebarfeeds-title {
+  display: none;
+}
+
+@media (min-width: 1000px) and (max-width: 1400px) {
+  .sidebarfeeds {
+    max-width: 225px;
+  }
+}
