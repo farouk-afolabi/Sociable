@@ -6,11 +6,8 @@ import "./Sidebar.css";
 import {
   FaStore,
   FaHome,
-  FaBriefcase,
-  FaChalkboardTeacher,
   FaBlog,
   FaUser,
-  FaSchool,
   FaBars,
   FaTimes
 } from "react-icons/fa";
