@@ -6,7 +6,7 @@ import { getAnalytics } from "firebase/analytics";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyAIkiZ19Uav0uXpgkt3H2vNx0qjkYGC5Rw",
+  apiKey: process.env.REACT_APP_GOOGLE_API_KEY,
   authDomain: "trainlinkit-c98b9.firebaseapp.com",
   projectId: "trainlinkit-c98b9",
   storageBucket: "trainlinkit-c98b9.firebasestorage.app",
