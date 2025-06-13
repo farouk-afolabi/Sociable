@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/Sociable/static/css/main.600e137e.css",
+    "main.js": "/Sociable/static/js/main.dcabdf8a.js",
+    "index.html": "/Sociable/index.html",
+    "main.600e137e.css.map": "/Sociable/static/css/main.600e137e.css.map",
+    "main.dcabdf8a.js.map": "/Sociable/static/js/main.dcabdf8a.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.600e137e.css",
+    "static/js/main.dcabdf8a.js"
+  ]
+}
