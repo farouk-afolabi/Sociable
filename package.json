@@ -1,6 +1,6 @@
 {
   "name": "sociable",
-  "homepage": "https://farouk-afolabi.github.io/Sociable",
+  "homepage": "https://farouk-afolabi.github.io/Sociable/",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -26,7 +26,11 @@
     "stream-http": "^3.2.0",
     "timers-browserify": "^2.0.12",
     "url": "^0.11.4"
+    
+
   },
+  
+  
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",

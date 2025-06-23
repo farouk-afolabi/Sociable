@@ -30,6 +30,7 @@ const Followers = () => {
         if (userData.followers && Array.isArray(userData.followers)) {
           setFollowers(userData.followers); // Set followers list
           fetchFollowersDetails(userData.followers); // Fetch details for each follower
+          console.log(followers);
         } else {
           setFollowers([]);
           setErrorMessage("No followers found.");
