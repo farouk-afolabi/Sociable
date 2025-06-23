@@ -8,7 +8,6 @@ import {
   FaArrowRight,
   FaArrowLeft,
   FaUserFriends,
-  FaChalkboardTeacher,
   FaRegHandshake,
   FaUserCheck,
 } from "react-icons/fa";

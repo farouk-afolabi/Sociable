@@ -7,7 +7,6 @@ import { Link } from "react-router-dom"; // Importing Link from react-router-dom
 import "./Followers.css"; // Importing the css file for styling
 
 const Following = () => {
-  const [following, setFollowing] = useState([]); // List of following users updating every time
   const [errorMessage, setErrorMessage] = useState(""); // To hold error message
   const [followersDetails, setFollowersDetails] = useState([]); // To store followers with full name
 
@@ -28,10 +27,8 @@ const Following = () => {
         const userData = userSnap.data();
 
         if (userData.following && Array.isArray(userData.following)) {
-          setFollowing(userData.following); // Set following list
-          fetchFollowersDetails(userData.following); // Fetch details for each follower
+          fetchFollowersDetails(userData.following); // Fetch details for each following user
         } else {
-          setFollowing([]);
           setErrorMessage("No following found.");
         }
       } else {
@@ -43,7 +40,7 @@ const Following = () => {
       const followersData = [];
 
       for (const userId of followingList) {
-        const userRef = doc(db, "users", userId); // Get each follower document reference
+        const userRef = doc(db, "users", userId); // Get each following user's document reference
         const userSnap = await getDoc(userRef);
 
         if (userSnap.exists()) {
@@ -68,13 +65,13 @@ const Following = () => {
               </div>
               <div className="icon-text">
                 {userData.firstName && userData.lastName ? (
-                  <FaUser  />
+                  <FaUser />
                 ) : (
                   <FaStore />
                 )}
               </div>
             </div>
-          ); // Fallback to businessName or 'Unknown'
+          );
 
           followersData.push({ userId, fullName });
         }
@@ -88,8 +85,7 @@ const Following = () => {
 
   return (
     <div>
-      {errorMessage && <p>{errorMessage}</p>}{" "}
-      {/* Display error message if it exists */}
+      {errorMessage && <p>{errorMessage}</p>}
       <div className="followers-list">
         {followersDetails.length > 0 ? (
           followersDetails.map((follower) => (
@@ -97,10 +93,10 @@ const Following = () => {
               <Link to={`/profile/${follower.userId}`}>
                 {follower.fullName}
               </Link>
-            </div> // Link to their profile page
+            </div>
           ))
         ) : (
-          <p className="noFollowers">No following to display</p> // If no following found
+          <p className="noFollowers">No following to display</p>
         )}
       </div>
     </div>
