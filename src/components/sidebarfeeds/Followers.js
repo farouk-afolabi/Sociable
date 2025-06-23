@@ -81,6 +81,10 @@ const Followers = () => {
   return (
     <div>
       {errorMessage && <p>{errorMessage}</p>}
+
+      {/* Display follower count */}
+      <p>Total Followers: {followers.length}</p>
+
       <div className="followers-list">
         {followersDetails.length > 0 ? (
           followersDetails.map((follower) => (
