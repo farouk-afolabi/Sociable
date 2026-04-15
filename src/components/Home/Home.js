@@ -1,26 +1,54 @@
 import React from "react";
-import PostFeed from "../PostFeed/PostFeed.js";  // Import the PostFeed component
+import { Box } from "@mui/material";
+import PostFeed from "../PostFeed/PostFeed.js";
 import Sidebar from "../Sidebar/sidebar.js";
 import Sidebarfeeds from "../sidebarfeeds/Sidebarfeeds.js";
-import './Home.css'; 
-import '../Sidebar/Sidebar.css';
-import '../sidebarfeeds/Sidebarfeeds.css';
-import '../PostFeed/PostFeed.css';  
+
+const SIDEBAR_WIDTH   = 260;
+const RIGHTBAR_WIDTH  = 280;
 
 function Home() {
   return (
-    <div className="home-container">
-      {/* Sidebar component */}
+    <Box sx={{ display: "flex", minHeight: "100vh", bgcolor: "background.default" }}>
       <Sidebar />
 
-      {/* Main Content (Posts feed) */}
-      <div className="main-content">
-      
-        {/* PostFeed component handles both the posts and post creation */}
-        <PostFeed/>
-        <Sidebarfeeds  className="sidebar-right"/>
-      </div>
-    </div>
+      {/* Main feed — offset by sidebar widths */}
+      <Box
+        component="main"
+        sx={{
+          flex: 1,
+          ml: `${SIDEBAR_WIDTH}px`,
+          mr: { xs: 0, lg: `${RIGHTBAR_WIDTH}px` },
+          maxWidth: 680,
+          mx: "auto",
+          px: { xs: 2, sm: 3 },
+          py: 3,
+          // On large screens the auto-margin fights with the fixed sidebars,
+          // so we override to be sidebar-aware
+          "@media (min-width: 1200px)": {
+            ml: `${SIDEBAR_WIDTH}px`,
+            mr: `${RIGHTBAR_WIDTH}px`,
+            maxWidth: "none",
+          },
+        }}
+      >
+        <PostFeed />
+      </Box>
+
+      {/* Right sidebar */}
+      <Box
+        sx={{
+          display: { xs: "none", lg: "block" },
+          position: "fixed",
+          right: 0,
+          top: 0,
+          bottom: 0,
+          width: RIGHTBAR_WIDTH,
+        }}
+      >
+        <Sidebarfeeds />
+      </Box>
+    </Box>
   );
 }
 

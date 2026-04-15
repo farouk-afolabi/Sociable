@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { db } from "../../firebase";
-import { collection, getDocs, doc, getDoc } from "firebase/firestore";
+import { collection, getDocs, doc, getDoc, query, limit } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { FaStore, FaUser } from "react-icons/fa";
 import { Link } from "react-router-dom"; // Import Link from react-router-dom
@@ -37,7 +37,7 @@ const SuggestedFriends = ({ showAll }) => {
         const followingList = userData.following || [];
         const followersList = userData.followers || [];
 
-        const allUsersSnap = await getDocs(collection(db, "users"));
+        const allUsersSnap = await getDocs(query(collection(db, "users"), limit(50)));
         const allUsers = allUsersSnap.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),

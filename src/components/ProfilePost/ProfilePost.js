@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { db, auth } from "../../firebase";
 import {
   collection,
@@ -7,10 +7,13 @@ import {
   query,
   where,
   orderBy,
+  limit,
   onSnapshot,
   deleteDoc,
   updateDoc,
 } from "firebase/firestore";
+
+const PAGE_SIZE = 20;
 import { useParams } from "react-router-dom";
 import "./ProfilePost.css";
 import { FaEdit, FaTrash } from "react-icons/fa";
@@ -22,6 +25,9 @@ function ProfilePost() {
   const [loading, setLoading] = useState(true);
   const { userId: profileUserId } = useParams();
 
+  // Cache display names so profile re-renders don't re-fetch
+  const nameCache = useRef({});
+
   // Get current user ID
   useEffect(() => {
     const unsubscribeAuth = auth.onAuthStateChanged((user) => {
@@ -30,21 +36,18 @@ function ProfilePost() {
     return () => unsubscribeAuth();
   }, []);
 
-  // Fetch user display name (checks for businessName if no firstName/lastName)
   const getUserDisplayName = async (userId) => {
+    if (nameCache.current[userId]) return nameCache.current[userId];
     try {
       const userDoc = await getDoc(doc(db, "users", userId));
       if (!userDoc.exists()) return "Anonymous";
-
       const userData = userDoc.data();
-
-      // Check for business name if personal name doesn't exist
-      if (userData.firstName && userData.lastName) {
-        return `${userData.firstName} ${userData.lastName}`;
-      } else if (userData.businessName) {
-        return userData.businessName;
-      }
-      return "Anonymous";
+      const name =
+        userData.firstName && userData.lastName
+          ? `${userData.firstName} ${userData.lastName}`
+          : userData.businessName || "Anonymous";
+      nameCache.current[userId] = name;
+      return name;
     } catch (error) {
       console.error("Error fetching user:", error);
       return "Anonymous";
@@ -62,7 +65,8 @@ function ProfilePost() {
     const q = query(
       collection(db, "posts"),
       where("userId", "==", profileUserId),
-      orderBy("timestamp", "desc")
+      orderBy("timestamp", "desc"),
+      limit(PAGE_SIZE)
     );
 
     const unsubscribe = onSnapshot(q, async (snapshot) => {

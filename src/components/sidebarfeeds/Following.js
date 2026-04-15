@@ -37,20 +37,15 @@ const Following = () => {
     };
 
     const fetchFollowersDetails = async (followingList) => {
-      const followersData = [];
-
-      for (const userId of followingList) {
-        const userRef = doc(db, "users", userId); // Get each following user's document reference
-        const userSnap = await getDoc(userRef);
-
-        if (userSnap.exists()) {
+      const results = await Promise.all(
+        followingList.map(async (uid) => {
+          const userSnap = await getDoc(doc(db, "users", uid));
+          if (!userSnap.exists()) return null;
           const userData = userSnap.data();
-
           const profileImage =
             userData.profilePic && userData.profilePic !== ""
               ? userData.profilePic
-              : "profilePic.png"; // Use fallback image if profilePic is empty or undefined
-
+              : "profilePic.png";
           const fullName = (
             <div className="follower-info">
               <img
@@ -64,20 +59,14 @@ const Following = () => {
                   : userData.businessName || "Unknown"}
               </div>
               <div className="icon-text">
-                {userData.firstName && userData.lastName ? (
-                  <FaUser />
-                ) : (
-                  <FaStore />
-                )}
+                {userData.firstName && userData.lastName ? <FaUser /> : <FaStore />}
               </div>
             </div>
           );
-
-          followersData.push({ userId, fullName });
-        }
-      }
-
-      setFollowersDetails(followersData); // Set followers details state
+          return { userId: uid, fullName };
+        })
+      );
+      setFollowersDetails(results.filter(Boolean));
     };
 
     fetchUserData();

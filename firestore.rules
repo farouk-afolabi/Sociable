@@ -1,0 +1,103 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ─────────────────────────────────────────────
+    // USERS
+    // ─────────────────────────────────────────────
+    // Any logged-in user can read profiles (needed for search, suggested friends, post author display)
+    // Only the owner can write their own profile
+    match /users/{uid} {
+      allow read: if request.auth != null;
+
+      // Registration: user creates their own doc
+      allow create: if request.auth != null
+                    && request.auth.uid == uid
+                    && request.resource.data.uid == uid;
+
+      // Profile updates: only the owner; cannot change uid or email
+      allow update: if request.auth != null
+                    && request.auth.uid == uid
+                    && request.resource.data.uid == resource.data.uid
+                    && request.resource.data.email == resource.data.email;
+
+      allow delete: if false; // Never allow profile deletion via client
+    }
+
+    // ─────────────────────────────────────────────
+    // POSTS
+    // ─────────────────────────────────────────────
+    match /posts/{postId} {
+      allow read: if request.auth != null;
+
+      // Create: must be authenticated and must set userId to their own uid
+      allow create: if request.auth != null
+                    && request.resource.data.userId == request.auth.uid;
+
+      // Update: only the post owner (for commentsCount increments or edits)
+      allow update: if request.auth != null
+                    && resource.data.userId == request.auth.uid;
+
+      allow delete: if request.auth != null
+                    && resource.data.userId == request.auth.uid;
+
+      // ── Comments subcollection ──
+      match /comments/{commentId} {
+        allow read: if request.auth != null;
+
+        allow create: if request.auth != null
+                      && request.resource.data.userId == request.auth.uid;
+
+        // Only the comment author can delete their comment
+        allow delete: if request.auth != null
+                      && resource.data.userId == request.auth.uid;
+
+        allow update: if false; // No comment editing supported
+      }
+
+      // ── Likes subcollection ──
+      // Document ID is the user's UID — enforces one like per user
+      match /likes/{likeUserId} {
+        allow read: if request.auth != null;
+
+        // Can only create/delete your own like document
+        allow write: if request.auth != null
+                     && request.auth.uid == likeUserId;
+      }
+    }
+
+    // ─────────────────────────────────────────────
+    // CHATS
+    // ─────────────────────────────────────────────
+    match /chats/{chatId} {
+      // Only participants in the chat can read it
+      allow read: if request.auth != null
+                  && request.auth.uid in resource.data.participants;
+
+      // Create: user must include themselves in participants
+      allow create: if request.auth != null
+                    && request.auth.uid in request.resource.data.participants;
+
+      // Update (e.g. lastMessage field): only participants
+      allow update: if request.auth != null
+                    && request.auth.uid in resource.data.participants
+                    && request.resource.data.participants == resource.data.participants; // Cannot change who is in the chat
+
+      allow delete: if false;
+
+      // ── Messages subcollection ──
+      match /messages/{messageId} {
+        // Only chat participants can read messages
+        allow read: if request.auth != null
+                    && request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.participants;
+
+        // Only chat participants can send messages, and must identify themselves as sender
+        allow create: if request.auth != null
+                      && request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.participants
+                      && request.resource.data.senderId == request.auth.uid;
+
+        allow update, delete: if false; // No message editing or deletion
+      }
+    }
+  }
+}

@@ -2,11 +2,9 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth"; // Import Firebase Auth
 import { getFirestore, collection, onSnapshot } from "firebase/firestore"; // Import Firestore
-import { getAnalytics } from "firebase/analytics";
-
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: process.env.REACT_APP_GOOGLE_API_KEY,
+  apiKey: import.meta.env.VITE_GOOGLE_API_KEY,
   authDomain: "trainlinkit-c98b9.firebaseapp.com",
   projectId: "trainlinkit-c98b9",
   storageBucket: "trainlinkit-c98b9.firebasestorage.app",
@@ -16,11 +14,9 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app); // Optional, if you are using Analytics
 
 // Initialize Firebase Authentication and Firestore
-const auth = getAuth(app); // Firebase authentication instance
-const db = getFirestore(app); // Firestore instance
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-// Export the services to be used in other files
-export { auth, db, analytics, collection, onSnapshot };
+export { auth, db, collection, onSnapshot };

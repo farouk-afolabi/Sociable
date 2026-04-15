@@ -38,20 +38,15 @@ const Followers = () => {
     };
 
     const fetchFollowersDetails = async (followersList) => {
-      const followersData = [];
-
-      for (const userId of followersList) {
-        const userRef = doc(db, "users", userId);
-        const userSnap = await getDoc(userRef);
-
-        if (userSnap.exists()) {
+      const results = await Promise.all(
+        followersList.map(async (uid) => {
+          const userSnap = await getDoc(doc(db, "users", uid));
+          if (!userSnap.exists()) return null;
           const userData = userSnap.data();
-
           const profileImage =
             userData.profilePic && userData.profilePic !== ""
               ? userData.profilePic
               : "profilePic.png";
-
           const fullName = (
             <div className="follower-info">
               <img
@@ -67,12 +62,10 @@ const Followers = () => {
               {userData.firstName && userData.lastName ? <FaUser /> : <FaStore />}
             </div>
           );
-
-          followersData.push({ userId, fullName });
-        }
-      }
-
-      setFollowersDetails(followersData);
+          return { userId: uid, fullName };
+        })
+      );
+      setFollowersDetails(results.filter(Boolean));
     };
 
     fetchUserData();

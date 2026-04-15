@@ -1,51 +1,60 @@
-import React from "react";
+import React, { Suspense, lazy } from "react";
 import { HashRouter as Router, Routes, Route, Navigate, Outlet } from "react-router-dom";
-import Login from "./components/Login/Login";
-import Register from "./components/Register/Register";
-import Home from "./components/Home/Home";
-import Profile from "./components/Profile/Profile";
-import PostDetail from "./components/postdetail/postdetail";
-import Messenger from "./components/messenger/messenger";
-import { AuthProvider, useAuth } from './context/AuthContext';
+import { AuthProvider, useAuth } from "./context/AuthContext";
+import { ThemeProvider } from "./context/ThemeContext";
+import ErrorBoundary from "./components/ErrorBoundary";
+
+// Code-split every route so only the current page is downloaded on first load
+const Login    = lazy(() => import("./components/Login/Login"));
+const Register = lazy(() => import("./components/Register/Register"));
+const Home     = lazy(() => import("./components/Home/Home"));
+const Profile  = lazy(() => import("./components/Profile/Profile"));
+const PostDetail = lazy(() => import("./components/postdetail/postdetail"));
+const Messenger  = lazy(() => import("./components/messenger/messenger"));
+
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <Routes>
-          {/* Public Routes */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          
-          {/* Private Routes */}
-          <Route element={<PrivateRoute />}>
-            <Route path="/home" element={<Home />} />
-            <Route path="/profile/:userId" element={<Profile />} />
-            <Route path="/post/:postId" element={<PostDetail />} />
-            <Route path="/messenger" element={<Messenger />} />
-          </Route>
+    <ErrorBoundary>
+      <ThemeProvider>
+      <AuthProvider>
+        <Router>
+          <Suspense fallback={<div style={{ padding: "2rem", textAlign: "center" }}>Loading…</div>}>
+            <Routes>
+              {/* Public Routes */}
+              <Route path="/login"    element={<Login />} />
+              <Route path="/register" element={<Register />} />
 
-          {/* Redirect Root */}
-          <Route path="/" element={<RootRedirect />} />
+              {/* Private Routes */}
+              <Route element={<PrivateRoute />}>
+                <Route path="/home"              element={<Home />} />
+                <Route path="/profile/:userId"   element={<Profile />} />
+                <Route path="/post/:postId"       element={<PostDetail />} />
+                <Route path="/messenger"         element={<Messenger />} />
+              </Route>
 
-          {/* 404 Page */}
-          <Route path="*" element={<p>404 - Page Not Found</p>} />
-        </Routes>
-      </Router>
-    </AuthProvider>
+              {/* Redirect Root */}
+              <Route path="/" element={<RootRedirect />} />
+
+              {/* 404 */}
+              <Route path="*" element={<p style={{ padding: "2rem" }}>404 — Page not found</p>} />
+            </Routes>
+          </Suspense>
+        </Router>
+      </AuthProvider>
+      </ThemeProvider>
+    </ErrorBoundary>
   );
 }
 
-// PrivateRoute component using AuthContext
 const PrivateRoute = () => {
   const { currentUser, loading } = useAuth();
-  
-  if (loading) return <p>Loading...</p>;
+  if (loading) return <div style={{ padding: "2rem", textAlign: "center" }}>Loading…</div>;
   return currentUser ? <Outlet /> : <Navigate to="/login" />;
 };
 
-// RootRedirect component using AuthContext
 const RootRedirect = () => {
-  const { currentUser } = useAuth();
+  const { currentUser, loading } = useAuth();
+  if (loading) return null;
   return currentUser ? <Navigate to="/home" /> : <Navigate to="/login" />;
 };
 
