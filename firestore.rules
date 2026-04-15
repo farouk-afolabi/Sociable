@@ -98,6 +98,20 @@ service cloud.firestore {
 
         allow update, delete: if false; // No message editing or deletion
       }
+
+      // ── Typing indicators subcollection ──
+      // Document ID is the typing user's UID
+      match /typing/{typingUserId} {
+        // Only chat participants can see who is typing
+        allow read: if request.auth != null
+                    && request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.participants;
+
+        // Users can only write or delete their own typing document,
+        // and only if they are a participant in the chat
+        allow write: if request.auth != null
+                     && request.auth.uid == typingUserId
+                     && request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.participants;
+      }
     }
   }
 }

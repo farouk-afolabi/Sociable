@@ -209,7 +209,7 @@ const Messenger = () => {
                   messages={messages}
                   currentUser={currentUser}
                 />
-                <MessageInput onSend={handleSendMessage} />
+                <MessageInput onSend={handleSendMessage} chatId={activeChat.id} currentUser={currentUser} />
               </>
             ) : (
               <Box
