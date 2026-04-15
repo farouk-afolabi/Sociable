@@ -1,7 +1,8 @@
 // Import the necessary functions from Firebase SDKs
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth"; // Import Firebase Auth
-import { getFirestore, collection, onSnapshot } from "firebase/firestore"; // Import Firestore
+import { getFirestore, collection, onSnapshot } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
 // Your web app's Firebase configuration
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_GOOGLE_API_KEY,
@@ -18,5 +19,6 @@ const app = initializeApp(firebaseConfig);
 // Initialize Firebase Authentication and Firestore
 const auth = getAuth(app);
 const db = getFirestore(app);
+const storage = getStorage(app);
 
-export { auth, db, collection, onSnapshot };
+export { auth, db, storage, collection, onSnapshot };

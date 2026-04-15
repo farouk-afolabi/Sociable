@@ -1,0 +1,58 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // ── Helpers ────────────────────────────────────────────────────────────────
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+
+    // Allowed image MIME types
+    function isValidImageType() {
+      return request.resource.contentType in [
+        'image/jpeg',
+        'image/png',
+        'image/webp',
+        'image/gif'
+      ];
+    }
+
+    // Hard 5 MB cap — enforced server-side regardless of client-side compression
+    function isUnder5MB() {
+      return request.resource.size <= 5 * 1024 * 1024;
+    }
+
+    // ── Post images: posts/{userId}/{fileName} ─────────────────────────────────
+    match /posts/{userId}/{fileName} {
+      // Any authenticated user can view post images
+      allow read: if isAuthenticated();
+
+      // Only the owner can upload; must be a valid image under 5 MB
+      allow write: if isAuthenticated()
+                   && isOwner(userId)
+                   && isValidImageType()
+                   && isUnder5MB();
+    }
+
+    // ── Avatar images: avatars/{userId}/{fileName} ────────────────────────────
+    match /avatars/{userId}/{fileName} {
+      // Any authenticated user can view avatars (needed for post author display)
+      allow read: if isAuthenticated();
+
+      // Only the owner can upload their own avatar; same type + size rules
+      allow write: if isAuthenticated()
+                   && isOwner(userId)
+                   && isValidImageType()
+                   && isUnder5MB();
+    }
+
+    // ── Deny everything else ──────────────────────────────────────────────────
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
