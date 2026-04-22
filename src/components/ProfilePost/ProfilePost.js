@@ -36,21 +36,23 @@ function ProfilePost() {
     return () => unsubscribeAuth();
   }, []);
 
-  const getUserDisplayName = async (userId) => {
+  const getUserData = async (userId) => {
     if (nameCache.current[userId]) return nameCache.current[userId];
     try {
       const userDoc = await getDoc(doc(db, "users", userId));
-      if (!userDoc.exists()) return "Anonymous";
+      if (!userDoc.exists()) return { name: "Anonymous", profilePic: "/profilepic.png" };
       const userData = userDoc.data();
-      const name =
-        userData.firstName && userData.lastName
+      const result = {
+        name: userData.firstName && userData.lastName
           ? `${userData.firstName} ${userData.lastName}`
-          : userData.businessName || "Anonymous";
-      nameCache.current[userId] = name;
-      return name;
+          : userData.businessName || "Anonymous",
+        profilePic: userData.profilePic || "/profilepic.png",
+      };
+      nameCache.current[userId] = result;
+      return result;
     } catch (error) {
       console.error("Error fetching user:", error);
-      return "Anonymous";
+      return { name: "Anonymous", profilePic: "/profilepic.png" };
     }
   };
 
@@ -79,10 +81,11 @@ function ProfilePost() {
               const postData = doc.data();
               if (!postData.content) return null;
 
-              const displayName = await getUserDisplayName(postData.userId);
+              const { name, profilePic } = await getUserData(postData.userId);
               return {
                 id: doc.id,
-                author: displayName,
+                author: name,
+                profilePic,
                 content: postData.content,
                 likesCount: postData.likesCount || 0,
                 commentsCount: postData.commentsCount || 0,
@@ -165,7 +168,7 @@ function ProfilePost() {
             <div key={post.id} className="post">
               <div className="post-header">
                 <img
-                  src="/profilepic.png"
+                  src={post.profilePic}
                   alt="Profile"
                   width="50"
                   height="50"

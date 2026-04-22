@@ -8,7 +8,6 @@ import Sidebar from "../Sidebar/sidebar.js";
 import ProfilePost from "../ProfilePost/ProfilePost.js";
 import LinkUpButton from "../LinkUpButton/LinkUpButton.js";
 import "../ProfilePost/ProfilePost.css";
-import "../LinkUpButton/LinkUpButton.css";
 import {
   Box,
   Avatar,

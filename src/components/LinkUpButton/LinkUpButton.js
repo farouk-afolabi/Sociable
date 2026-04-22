@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { auth, db } from '../../firebase';
 import { doc, getDoc, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
-import "./LinkUpButton.css"
+import { Button, CircularProgress, Snackbar, Alert } from '@mui/material';
+import PersonAddRoundedIcon from '@mui/icons-material/PersonAddRounded';
+import PersonRemoveRoundedIcon from '@mui/icons-material/PersonRemoveRounded';
 
 function LinkUpButton({ targetUserId }) {
   const [isFollowing, setIsFollowing] = useState(false);
@@ -32,8 +34,6 @@ function LinkUpButton({ targetUserId }) {
     if (!currentUser) return;
 
     const nowFollowing = !isFollowing;
-
-    // Optimistic update — flip the button immediately
     setIsFollowing(nowFollowing);
     setLoading(true);
     setError('');
@@ -51,7 +51,6 @@ function LinkUpButton({ targetUserId }) {
       }
     } catch (err) {
       console.error('Error updating follow status:', err);
-      // Revert optimistic update on failure
       setIsFollowing(!nowFollowing);
       setError('Failed to update follow status. Please try again.');
     } finally {
@@ -60,12 +59,45 @@ function LinkUpButton({ targetUserId }) {
   };
 
   return (
-    <div>
-      <button onClick={handleLinkUp} disabled={loading} className='linkup-btn'>
-        {loading ? 'Processing...' : isFollowing ? 'Unlink' : 'Link Up'}
-      </button>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-    </div>
+    <>
+      <Button
+        onClick={handleLinkUp}
+        disabled={loading}
+        variant={isFollowing ? 'outlined' : 'contained'}
+        color={isFollowing ? 'error' : 'primary'}
+        size="small"
+        startIcon={
+          loading
+            ? <CircularProgress size={14} color="inherit" />
+            : isFollowing
+              ? <PersonRemoveRoundedIcon fontSize="small" />
+              : <PersonAddRoundedIcon fontSize="small" />
+        }
+        sx={{
+          borderRadius: 5,
+          textTransform: 'none',
+          fontWeight: 600,
+          fontSize: 13,
+          px: 2,
+          py: 0.75,
+          minWidth: 110,
+          transition: 'all 0.2s ease',
+        }}
+      >
+        {loading ? 'Saving…' : isFollowing ? 'Unlink' : 'Link Up'}
+      </Button>
+
+      <Snackbar
+        open={!!error}
+        autoHideDuration={4000}
+        onClose={() => setError('')}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert severity="error" onClose={() => setError('')} sx={{ width: '100%' }}>
+          {error}
+        </Alert>
+      </Snackbar>
+    </>
   );
 }
 
