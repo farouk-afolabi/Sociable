@@ -9,62 +9,50 @@ function LinkUpButton({ targetUserId }) {
   const [error, setError] = useState('');
 
   useEffect(() => {
+    const currentUser = auth.currentUser;
+    if (!currentUser || !targetUserId) return;
+
     const checkIfFollowing = async () => {
-      const currentUser = auth.currentUser;
-      if (currentUser) {
-        try {
-          const currentUserDoc = await getDoc(doc(db, 'users', currentUser.uid));
-          if (currentUserDoc.exists()) {
-            const following = currentUserDoc.data().following || [];
-            setIsFollowing(following.includes(targetUserId));
-          } else {
-            setError('Current user document not found.');
-          }
-        } catch (error) {
-          console.error('Error checking follow status:', error);
-          setError('Failed to check follow status.');
+      try {
+        const snap = await getDoc(doc(db, 'users', currentUser.uid));
+        if (snap.exists()) {
+          const following = snap.data().following || [];
+          setIsFollowing(following.includes(targetUserId));
         }
+      } catch (err) {
+        console.error('Error checking follow status:', err);
       }
     };
+
     checkIfFollowing();
   }, [targetUserId]);
 
   const handleLinkUp = async () => {
+    const currentUser = auth.currentUser;
+    if (!currentUser) return;
+
+    const nowFollowing = !isFollowing;
+
+    // Optimistic update — flip the button immediately
+    setIsFollowing(nowFollowing);
     setLoading(true);
     setError('');
-    const currentUser = auth.currentUser;
-    if (!currentUser) {
-      alert('You must be logged in to follow users.');
-      return;
-    }
 
     try {
       const currentUserRef = doc(db, 'users', currentUser.uid);
-      const targetUserRef = doc(db, 'users', targetUserId);
+      const targetUserRef  = doc(db, 'users', targetUserId);
 
-      if (isFollowing) {
-        // Unfollow: Remove targetUserId from current user's following list
-        await updateDoc(currentUserRef, {
-          following: arrayRemove(targetUserId),
-        });
-        // Remove currentUserId from target user's followers list
-        await updateDoc(targetUserRef, {
-          followers: arrayRemove(currentUser.uid),
-        });
-        setIsFollowing(false);
+      if (nowFollowing) {
+        await updateDoc(currentUserRef, { following: arrayUnion(targetUserId) });
+        await updateDoc(targetUserRef,  { followers: arrayUnion(currentUser.uid) });
       } else {
-        // Follow: Add targetUserId to current user's following list
-        await updateDoc(currentUserRef, {
-          following: arrayUnion(targetUserId),
-        });
-        // Add currentUserId to target user's followers list
-        await updateDoc(targetUserRef, {
-          followers: arrayUnion(currentUser.uid),
-        });
-        setIsFollowing(true);
+        await updateDoc(currentUserRef, { following: arrayRemove(targetUserId) });
+        await updateDoc(targetUserRef,  { followers: arrayRemove(currentUser.uid) });
       }
-    } catch (error) {
-      console.error('Error updating follow status:', error);
+    } catch (err) {
+      console.error('Error updating follow status:', err);
+      // Revert optimistic update on failure
+      setIsFollowing(!nowFollowing);
       setError('Failed to update follow status. Please try again.');
     } finally {
       setLoading(false);
@@ -72,7 +60,7 @@ function LinkUpButton({ targetUserId }) {
   };
 
   return (
-    <div >
+    <div>
       <button onClick={handleLinkUp} disabled={loading} className='linkup-btn'>
         {loading ? 'Processing...' : isFollowing ? 'Unlink' : 'Link Up'}
       </button>

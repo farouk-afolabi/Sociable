@@ -19,6 +19,13 @@ service cloud.firestore {
       allow update: if request.auth != null
                     && request.auth.uid == uid
                     && request.resource.data.uid == resource.data.uid
+                    && request.resource.data.email == resource.data.email
+
+                    // Anyone can add/remove only their own UID from another user's followers array
+                    || request.auth != null
+                    && request.auth.uid != uid
+                    && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['followers'])
+                    && request.resource.data.uid == resource.data.uid
                     && request.resource.data.email == resource.data.email;
 
       allow delete: if false; // Never allow profile deletion via client
