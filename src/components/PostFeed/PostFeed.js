@@ -253,6 +253,7 @@ function PostFeed({ title }) {
   const fileInputRef = useRef(null);
   const userCache = useRef({});
   const likedPostsCache = useRef({});
+  const pendingLikes = useRef(new Set()); // postIds with an in-flight write
 
   // Clean up object URL when image is removed/changed
   useEffect(() => {
@@ -350,7 +351,21 @@ function PostFeed({ title }) {
         };
       });
 
-      if (isMounted) { setPosts(postsArray); setLoading(false); }
+      if (isMounted) {
+        setPosts((prev) => {
+          const prevMap = new Map(prev.map((p) => [p.id, p]));
+          return postsArray.map((p) => {
+            // If a like write is in-flight for this post, keep the optimistic
+            // count/liked state so Firestore's stale snapshot doesn't clobber it.
+            if (pendingLikes.current.has(p.id)) {
+              const prevPost = prevMap.get(p.id);
+              if (prevPost) return { ...p, liked: prevPost.liked, likesCount: prevPost.likesCount };
+            }
+            return p;
+          });
+        });
+        setLoading(false);
+      }
     });
 
     init();
@@ -457,22 +472,48 @@ function PostFeed({ title }) {
   const handleLike = useCallback(async (postId) => {
     const user = auth.currentUser;
     if (!user) return;
+
+    // Determine current liked state from cache
+    const wasLiked = likedPostsCache.current[postId] || false;
+    const delta = wasLiked ? -1 : 1;
+
+    // Mark write as in-flight so onSnapshot doesn't overwrite the optimistic state
+    pendingLikes.current.add(postId);
+
+    // Optimistic update — flip the button immediately
+    likedPostsCache.current[postId] = !wasLiked;
+    setPosts((prev) =>
+      prev.map((p) =>
+        p.id === postId
+          ? { ...p, liked: !wasLiked, likesCount: p.likesCount + delta }
+          : p
+      )
+    );
+
     const likeRef = doc(db, "posts", postId, "likes", user.uid);
     const postRef = doc(db, "posts", postId);
     try {
-      const [likeDoc, postDoc] = await Promise.all([getDoc(likeRef), getDoc(postRef)]);
-      if (!postDoc.exists()) return;
-      if (likeDoc.exists()) {
+      if (wasLiked) {
         await deleteDoc(likeRef);
         await updateDoc(postRef, { likesCount: increment(-1) });
-        likedPostsCache.current[postId] = false;
       } else {
         await setDoc(likeRef, { userId: user.uid });
         await updateDoc(postRef, { likesCount: increment(1) });
-        likedPostsCache.current[postId] = true;
       }
     } catch (err) {
       console.error("Like error:", err);
+      // Revert optimistic update on failure
+      likedPostsCache.current[postId] = wasLiked;
+      setPosts((prev) =>
+        prev.map((p) =>
+          p.id === postId
+            ? { ...p, liked: wasLiked, likesCount: p.likesCount - delta }
+            : p
+        )
+      );
+    } finally {
+      // Write is settled — let onSnapshot take over for this post again
+      pendingLikes.current.delete(postId);
     }
   }, []);
 
