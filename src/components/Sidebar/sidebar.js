@@ -26,6 +26,8 @@ import LightModeRoundedIcon from "@mui/icons-material/LightModeRounded";
 import MenuRoundedIcon from "@mui/icons-material/MenuRounded";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import { useThemeMode } from "../../context/ThemeContext";
+import { useAuth } from "../../context/AuthContext";
+import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
 
 const SIDEBAR_WIDTH = 260;
 
@@ -33,6 +35,12 @@ function Sidebar() {
   const userId = auth.currentUser?.uid;
   const navigate = useNavigate();
   const { mode, toggleMode } = useThemeMode();
+  const { logout } = useAuth();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate("/login");
+  };
 
   const [searchQuery, setSearchQuery] = useState("");
   const [users, setUsers] = useState([]);
@@ -214,6 +222,19 @@ function Sidebar() {
           </ListItemButton>
         ))}
       </List>
+
+      <Box sx={{ mt: "auto" }}>
+        <Divider sx={{ mb: 1 }} />
+        <ListItemButton onClick={handleLogout} sx={{ borderRadius: 2, color: "error.main" }}>
+          <ListItemIcon sx={{ minWidth: 36, color: "error.main" }}>
+            <LogoutRoundedIcon />
+          </ListItemIcon>
+          <ListItemText
+            primary="Log out"
+            primaryTypographyProps={{ fontWeight: 500, fontSize: 14 }}
+          />
+        </ListItemButton>
+      </Box>
     </Box>
   );
 
